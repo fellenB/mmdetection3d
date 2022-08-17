@@ -1,0 +1,31 @@
+#load image from tar
+sudo docker load -i docker/mmdetection3d_torch1.8.tar 
+
+#run image
+xhost +
+sudo docker run --gpus all --shm-size=8g --name 3dshow -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -e GDK_SCALE -e GDK_DPI_SCALE -v /home/fellen/mmdetection3d/data_in_docker:/mmdetection3d/data mmdetection3d_torch1.8
+
+#docker添加用户组
+sudo groupadd docker   #添加docker用户组
+sudo gpasswd -a $USER docker   #将登陆用户加入到docker用户组中
+newgrp docker   #更新用户组
+
+=========================================================================
+#open3D问题
+libGL error: No matching fbConfigs or visuals found
+libGL error: failed to load driver: swrast
+[Open3D WARNING] GLFW Error: GLX: Failed to create context: BadMatch (invalid parameter attributes)
+[Open3D WARNING] Failed to create window
+
+# --gpu all
+docker: Error response from daemon: could not select device driver "" with capabilities: [[gpu]]
+需要安装nvidia-container-toolkit如下：
+Ubuntu 16.04/18.04, Debian Jessie/Stretch/Buster：
+
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+sudo systemctl restart docker
+
